@@ -143,5 +143,5 @@ cd ..
 
 Finally the summary tree is visualized. Once the below command is run you must make sure that branch info, branch support and show leaf names are enabled and that G3077_H_sp_nov leaf selected to produce the same final tree.
 ```
-ete3 view -t asteral_output.txt # created a fullTree50.pdf with branch info, branch support and show leaf names enabled and the G3077_H_sp_nov leaf selected
+ete3 view -t asteral_output.txt 
 ```
