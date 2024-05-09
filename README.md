@@ -59,17 +59,17 @@ Then we need to create a blast database from the reference sequence.
 cd Hamicus_unaligned/
 ../uce_to_protein.py blastdb -i Trichonephila_antipodiana.pep.fasta
 ```
-Next we blast each UCE against the database.
+Next we blast each UCE locus against the database. This returns .xml files that contain blast results for each UCE locus and a configuration file that matches a FASTA file to its corresponding .xml file.
 ```
 ../uce_to_protein.py queryblast -i *unaligned.fasta
 ```
 
-From the previou blast results, we retrieve the best hits
+From the previous blast results stored in .xml file, we retrieve the best hits. A single SQLite database is created from each .xml file storing the locus name, taxon name, name of annotated protein matched in the reference, nucleotide query trimmed from introns, trimmed and untrimmed protein queries, and protein subject that was matches the reference set.
 ```
 ../uce_to_protein.py parse -i fasta_to_xml.conf -o my_uce_hits.sqlite
 ```
 
-Finally we convert the SQLite database information about the best hits into a more typical FASTA format.
+Finally we convert the SQLite database information about the best hits into a more typical FASTA format, which requires a taxon configuration file, Hamicus_taxon-set.conf, that simply lists all the sample names.
 ```
 ../uce_to_protein.py queryprot -d my_uce_hits.sqlite -c Hamicus_taxon-set.conf -g all
 ```
@@ -128,7 +128,7 @@ mv RAxML_* ../../trees50/
 conda deactivate
 ```
 
-A summary tree is made from the best trees produced by RAxML.
+A summary tree is made from the best trees produced by RAxML using ASTER.
 ```
 conda activate testEnvPhylogny
 ls RAxML_bestTree.raxml-all-coding-nuc-uce-* > asterInputTest.txt
