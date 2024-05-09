@@ -1,0 +1,95 @@
+﻿conda config --add channels defaults
+conda config --add channels bioconda
+conda config --add channels conda-forge
+conda config --set channel_priority strict
+
+
+conda create -n testEnvPhylogny
+conda activate testEnvPhylogny
+conda install phyluce
+conda install ASTER
+conda install ete3
+conda deactivate
+conda create -n phylogenyRaxml
+conda activate phylogenyRaxml
+conda install raxml
+conda install python
+conda install sqlite
+conda install blast=2.12.
+
+
+cd Hamicus_unaligned/
+sed -i 's/uce-[0-9]*_//g' *.unaligned.fasta
+sed -i 's/ |uce-[0-9]*//g' *.unaligned.fasta
+
+
+cd Hamicus_unaligned/
+../uce_to_protein.py blastdb -i Trichonephila_antipodiana.pep.fasta
+
+
+../uce_to_protein.py queryblast -i *unaligned.fasta
+
+
+../uce_to_protein.py parse -i fasta_to_xml.conf -o my_uce_hits.sqlite
+
+
+../uce_to_protein.py queryprot -d my_uce_hits.sqlite -c Hamicus_taxon-set.conf -g all
+
+
+mkdir ../nucleotideHits
+cp all-coding-nuc-uce-* ../nucleotideHits/
+cd ../nucleotideHits/
+
+
+conda deactivate
+conda activate testEnvPhylogny
+
+
+for i in *.fasta; do phyluce_assembly_get_fasta_lengths --input $i --csv >> nucInfo.csv; done # trying to write output data to a csv file for easy of use
+mkdir lowTaxaLoci
+awk 'BEGIN { FS = "," } ; { if ($2<=47) {print $1, "has low taxa"; system("mv " $1 " lowTaxaLoci/" ) }}' nucInfo.csv 
+
+
+mkdir ../alignedHits
+for i in *.fasta; do mafft $i > ../alignedHits/$i; done
+ls ../alignedHits/ | wc -l
+ls *fasta | wc -l # double check the numbers are the same for each file count
+
+
+cd ../alignedHits
+rename 's/.unaligned/.aligned/' *.unaligned.fasta
+ls | head
+
+
+for i in *.fasta; do Gblocks $i b1=0.5 b2=0.5 b3=12 b4=7; done
+
+
+conda deactivate
+conda activate phylogenyRaxml
+mkdir ../../trees50/
+rm *gb.reduced
+
+
+for i in *.fasta-gb; do raxmlHPC -m GTRGAMMA -f a -# 50 -p 12345 -x 12345 -s $i -n raxml-$i; done
+
+
+mkdir ../../trees5
+mv RAxML_* ../../trees50/
+conda deactivate
+
+
+conda activate testEnvPhylogny
+ls RAxML_bestTree.raxml-all-coding-nuc-uce-* > asterInputTest.txt
+
+
+for i in RAxML_bestTree.raxml*; do cat $i >> asteralInput.txt; done
+
+
+astral -t 6 -o asteral_output.txt -i asteralInput.txt 2>asteral.log
+
+
+cp asteral_output.txt ..
+cd ..
+
+
+ete3 view -t asteral_output.txt
