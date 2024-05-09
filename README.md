@@ -145,3 +145,4 @@ Finally the summary tree is visualized. Once the below command is run you must m
 ```
 ete3 view -t asteral_output.txt 
 ```
+All code presented here is also available in the collatedCode.txt file.
