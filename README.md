@@ -103,8 +103,6 @@ ls *fasta | wc -l # double check the numbers are the same for each file count
 
 cd ../alignedHits
 rename 's/.unaligned/.aligned/' *.unaligned.fasta
-ls | head
-
 ```
 
 Gap regions are removed using Gblocks 0.91b which should have also been installed with previous packages.
