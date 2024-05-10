@@ -2,19 +2,16 @@
 
 # Background
 
-Ultra-Conserved Elements (UCE) are regions of the genome that are conserved across many species. Probe sets are designed to target UCEs of a specific clade for sequencing. This UCE data or more specifically the flanking regions around the UCE locus are used for phylogenomic analysis. 
+Ultra-Conserved Elements (UCE) are regions of the genome that are conserved across many species. Probe sets are designed to target UCEs of a specific clade for sequencing. This UCE data or more specifically the flanking regions around the UCE locus are then used for phylogenomic analysis. 
 My UCE data was provided to me by Rodrigo Monjaraz-Ruedas in Dr. Hedin’s Lab. The data was collected using a probe set for the retrolateral tibial apophysis clade of spiders developed by Zhang et al that targets exonic single copy orthologs.
 
-  Zhang, J., Li, Z., Lai, J., Zhang, Z. and Zhang, F. (2023), A novel probe set for the phylogenomics and evolution of RTA spiders. Cladistics, 39: 116-128. https://doi.org/10.1111/cla.12523
+Zhang, J., Li, Z., Lai, J., Zhang, Z. and Zhang, F. (2023), A novel probe set for the phylogenomics and evolution of RTA spiders. Cladistics, 39: 116-128. https://doi.org/10.1111/cla.12523
 
-The UCE data was collected from 67 spiders including 3 species of Habronattus jumping spiders as well as one potential novel Habronattus species. Each of the 3343 unaligned FASTA files corresponds to a UCE locus. Each file contains up to 67 sequences that correspond to the given UCE locus. Additionally there is a configuration file Hamicus_taxon-set.conf, containing the names of all the spiders that were sampled, that was used by Rodrigo some preliminary data manipulation and that will be using again.
+The UCE data was collected from 67 spiders including 3 species of Habronattus jumping spiders as well as one potential novel Habronattus species. Each of the 3343 unaligned FASTA files corresponds to a UCE locus. Each file contains up to 67 sequences that correspond to the given UCE locus. Additionally there is a configuration file Hamicus_taxon-set.conf, containing the names of all the spiders that were sampled, that was used by Rodrigo for some preliminary data manipulation and that will be used again.
 These overall steps are based on Borowiec’s paper that analyzed UCE data on army ants, including the custom python script uce_to_protein.py
-
-  Marek L Borowiec, Convergent Evolution of the Army Ant Syndrome and Congruence in Big-Data Phylogenetics, Systematic Biology, Volume 68, Issue 4, July 2019, Pages 642–656, https://doi.org/10.1093/sysbio/syy088
-
+Marek L Borowiec, Convergent Evolution of the Army Ant Syndrome and Congruence in Big-Data Phylogenetics, Systematic Biology, Volume 68, Issue 4, July 2019, Pages 642–656, https://doi.org/10.1093/sysbio/syy088
 Also included is a reference protein sequence for Trichonephila antipodiana (inside the Hamicus_unaligned directory).
-
-  Fan Z; Yuan T; Liu P; Wang LY; Jin JF; Zhang F; Zhang ZS (2021): A chromosome‐level genome of the spider Trichonephila antipodiana GigaScience Database. https://doi.org/10.5524/100868
+Fan Z; Yuan T; Liu P; Wang LY; Jin JF; Zhang F; Zhang ZS (2021): A chromosome‐level genome of the spider Trichonephila antipodiana GigaScience Database. https://doi.org/10.5524/100868
 
 The goal of this project is to develop a phylogeny to see how the novel species is related to the three known Habronattus species. 
 
@@ -30,6 +27,8 @@ conda config --add channels bioconda
 conda config --add channels conda-forge
 conda config --set channel_priority strict
 ```
+
+
 ```
 conda create -n testEnvPhylogny
 conda activate testEnvPhylogny
@@ -42,14 +41,16 @@ conda activate phylogenyRaxml
 conda install raxml
 conda install python
 conda install sqlite
-conda install blast ############### conda install blast=2.12.
+conda install blast=2.12.
 ```
+
 
 # UCE to Protein
 
 First all the sequence names need to be cleaned to remove UCE locus information. This is done to properly format the sequences for the custom python script.
 
 ```
+cd Hamicus_unaligned/
 sed -i 's/uce-[0-9]*_//g' *.unaligned.fasta
 sed -i 's/ |uce-[0-9]*//g' *.unaligned.fasta
 ```
@@ -64,12 +65,12 @@ Next we blast each UCE locus against the database. This returns .xml files that 
 ../uce_to_protein.py queryblast -i *unaligned.fasta
 ```
 
-From the previous blast results stored in .xml file, we retrieve the best hits. A single SQLite database is created from each .xml file storing the locus name, taxon name, name of annotated protein matched in the reference, nucleotide query trimmed from introns, trimmed and untrimmed protein queries, and protein subject that was matches the reference set.
+From the previous blast results stored in .xml files, we retrieve the best hits. A single SQLite database is created from each .xml file storing the locus name, taxon name, name of annotated protein matched in the reference, nucleotide query trimmed from introns, trimmed and untrimmed protein queries, and protein subject that was matches the reference set.
 ```
 ../uce_to_protein.py parse -i fasta_to_xml.conf -o my_uce_hits.sqlite
 ```
 
-Finally we convert the SQLite database information about the best hits into a more typical FASTA format, which requires a taxon configuration file, Hamicus_taxon-set.conf, that simply lists all the sample names.
+Finally we convert the SQLite database information about the best hits into a more typical FASTA format which requires a taxon configuration file, Hamicus_taxon-set.conf, that simply lists all the sample names.
 ```
 ../uce_to_protein.py queryprot -d my_uce_hits.sqlite -c Hamicus_taxon-set.conf -g all
 ```
@@ -103,16 +104,19 @@ ls *fasta | wc -l # double check the numbers are the same for each file count
 
 cd ../alignedHits
 rename 's/.unaligned/.aligned/' *.unaligned.fasta
+ls | head
+
 ```
 
-Gap regions are removed using Gblocks 0.91b which should have also been installed with previous packages.
+Gap regions are removed using Gblocks 0.91b which should have been installed with PHYLUCE.
 
 ```
 for i in *.fasta; do Gblocks $i b1=0.5 b2=0.5 b3=12 b4=7; done
 ```
+
 # Phylogeny
 
-Now the files are ready to be use to create a phylogeny for each of the loci using RAxML (50 bootstraps were used due to computational limitations). 
+Now the files are ready to be used to create a phylogeny for each of the loci using RAxML (50 bootstraps were used due to computational limitations). 
 ```
 conda deactivate
 conda activate phylogenyRaxml
@@ -140,6 +144,7 @@ cd ..
 
 Finally the summary tree is visualized. Once the below command is run you must make sure that branch info, branch support and show leaf names are enabled and that G3077_H_sp_nov leaf selected to produce the same final tree.
 ```
-ete3 view -t asteral_output.txt 
+ete3 view -t asteral_output.txt
 ```
+
 All code presented here is also available in the collatedCode.txt file.
