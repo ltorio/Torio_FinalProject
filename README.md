@@ -112,12 +112,11 @@ for i in *.fasta; do Gblocks $i b1=0.5 b2=0.5 b3=12 b4=7; done
 ```
 # Phylogeny
 
-Gblocks also produced gb.reduced files which are not properly formatted for RAxML and are deleted. Now the files are ready to be use to create a phylogeny for each of the loci using RAxML (50 bootstraps were used due to computational limitations). 
+Now the files are ready to be use to create a phylogeny for each of the loci using RAxML (50 bootstraps were used due to computational limitations). 
 ```
 conda deactivate
 conda activate phylogenyRaxml
 mkdir ../../trees50/
-rm *gb.reduced
 
 for i in *.fasta-gb; do raxmlHPC -m GTRGAMMA -f a -# 50 -p 12345 -x 12345 -s $i -n raxml-$i; done
 
