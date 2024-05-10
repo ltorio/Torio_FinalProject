@@ -58,8 +58,6 @@ ls *fasta | wc -l # double check the numbers are the same for each file count
 
 cd ../alignedHits
 rename 's/.unaligned/.aligned/' *.unaligned.fasta
-ls | head
-
 
 for i in *.fasta; do Gblocks $i b1=0.5 b2=0.5 b3=12 b4=7; done
 
