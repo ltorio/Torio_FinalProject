@@ -9,11 +9,15 @@ Zhang, J., Li, Z., Lai, J., Zhang, Z. and Zhang, F. (2023), A novel probe set fo
 
 The UCE data was collected from 67 spiders including 3 species of Habronattus jumping spiders as well as one potential novel Habronattus species. Each of the 3343 unaligned FASTA files corresponds to a UCE locus. Each file contains up to 67 sequences that correspond to the given UCE locus. Additionally there is a configuration file Hamicus_taxon-set.conf, containing the names of all the spiders that were sampled, that was used by Rodrigo for some preliminary data manipulation and that will be used again.
 These overall steps are based on Borowiec’s paper that analyzed UCE data on army ants, including the custom python script uce_to_protein.py
+
 Marek L Borowiec, Convergent Evolution of the Army Ant Syndrome and Congruence in Big-Data Phylogenetics, Systematic Biology, Volume 68, Issue 4, July 2019, Pages 642–656, https://doi.org/10.1093/sysbio/syy088
+
 Also included is a reference protein sequence for Trichonephila antipodiana (inside the Hamicus_unaligned directory).
+
 Fan Z; Yuan T; Liu P; Wang LY; Jin JF; Zhang F; Zhang ZS (2021): A chromosome‐level genome of the spider Trichonephila antipodiana GigaScience Database. https://doi.org/10.5524/100868
 
 The goal of this project is to develop a phylogeny to see how the novel species is related to the three known Habronattus species. 
+
 
 # environments and packages
 
